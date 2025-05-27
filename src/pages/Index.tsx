@@ -3,14 +3,14 @@ import React, { useState } from 'react';
 import AuthLayout from '@/components/auth/AuthLayout';
 import ChatDashboard from '@/components/chat/ChatDashboard';
 
-const Index = () => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+const Index: React.FC = () => {
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
 
-  const handleAuthSuccess = () => {
+  const handleAuthSuccess = (): void => {
     setIsAuthenticated(true);
   };
 
-  const handleLogout = () => {
+  const handleLogout = (): void => {
     setIsAuthenticated(false);
   };
 
