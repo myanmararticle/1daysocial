@@ -1,9 +1,8 @@
 
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
 import { 
   Heart, 
   MessageCircle, 
@@ -12,9 +11,10 @@ import {
   Camera,
   Search,
   Bell,
-  Plus,
   Star,
-  Clock
+  Clock,
+  User,
+  UserPlus
 } from "lucide-react";
 import { useNavigate } from 'react-router-dom';
 import BottomNavigation from '@/components/BottomNavigation';
@@ -40,6 +40,9 @@ interface Post {
 const Feed = () => {
   const navigate = useNavigate();
   const [userPoints] = useState(150);
+  const [currentPostIndex, setCurrentPostIndex] = useState(0);
+  const containerRef = useRef<HTMLDivElement>(null);
+  
   const [posts, setPosts] = useState<Post[]>([
     {
       id: 1,
@@ -50,10 +53,10 @@ const Feed = () => {
         hobby: "Gaming"
       },
       content: "Gaming tournament မှာ ပါဝင်နေတယ်! သူငယ်ချင်းတွေ ကံကောင်းပါစေ 🎯 ဘယ်သူတွေ ကြည့်နေလဲ?",
-      image: "https://images.unsplash.com/photo-1542751371-adc38448a05e?w=500&h=300&fit=crop",
-      likes: 24,
-      comments: 8,
-      shares: 3,
+      image: "https://images.unsplash.com/photo-1542751371-adc38448a05e?w=400&h=600&fit=crop",
+      likes: 124,
+      comments: 48,
+      shares: 13,
       timeAgo: "2h ago",
       isLiked: false
     },
@@ -65,10 +68,11 @@ const Feed = () => {
         isVerified: false,
         hobby: "Movies"
       },
-      content: "နောက်ဆုံးထွက်တဲ့ Marvel ရုပ်ရှင်ကြည့်ပြီးပြီ။ အရမ်းကောင်းတယ်! ဘယ်သူတွေကြည့်ပြီးပြီလဲ? spoiler မပေးပါနဲ့နော် 🍿✨",
-      likes: 45,
-      comments: 12,
-      shares: 7,
+      content: "နောက်ဆုံးထွက်တဲ့ Marvel ရုပ်ရှင်ကြည့်ပြီးပြီ။ အရမ်းကောင်းတယ်! ဘယ်သူတွေကြည့်ပြီးပြီလဲ? 🍿✨",
+      image: "https://images.unsplash.com/photo-1489599558913-b62e7b5fab05?w=400&h=600&fit=crop",
+      likes: 245,
+      comments: 82,
+      shares: 27,
       timeAgo: "4h ago",
       isLiked: true
     },
@@ -81,11 +85,27 @@ const Feed = () => {
         hobby: "Sports"
       },
       content: "ဒီနေ့ညနေ ဘောလုံးပွဲကြည့်မယ်။ ဘယ်တီးမကိုင်းမလဲ? စိုစိုရွှမ်းရွှမ်း ဖြစ်နေပြီ 🏆⚽",
-      image: "https://images.unsplash.com/photo-1522778119026-d647f0596c20?w=500&h=300&fit=crop",
-      likes: 31,
-      comments: 18,
-      shares: 5,
+      image: "https://images.unsplash.com/photo-1522778119026-d647f0596c20?w=400&h=600&fit=crop",
+      likes: 331,
+      comments: 118,
+      shares: 45,
       timeAgo: "6h ago",
+      isLiked: false
+    },
+    {
+      id: 4,
+      user: {
+        name: "မေမေ",
+        avatar: "🎵",
+        isVerified: true,
+        hobby: "Music"
+      },
+      content: "နောက်ဆုံး song cover လုပ်ပြီးပြီ။ ကြားကြည့်ပြီး comment ပေးကြပါနော် 🎤🎶",
+      image: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400&h=600&fit=crop",
+      likes: 89,
+      comments: 34,
+      shares: 12,
+      timeAgo: "8h ago",
       isLiked: false
     }
   ]);
@@ -102,142 +122,155 @@ const Feed = () => {
     ));
   };
 
+  const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    const container = e.currentTarget;
+    const scrollTop = container.scrollTop;
+    const itemHeight = container.clientHeight;
+    const newIndex = Math.round(scrollTop / itemHeight);
+    
+    if (newIndex !== currentPostIndex && newIndex >= 0 && newIndex < posts.length) {
+      setCurrentPostIndex(newIndex);
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50">
-      {/* Header */}
-      <div className="sticky top-0 z-10 bg-white/90 backdrop-blur-lg border-b border-gray-200 p-4">
-        <div className="max-w-4xl mx-auto flex items-center justify-between">
+    <div className="min-h-screen bg-white">
+      {/* Top Header */}
+      <div className="fixed top-0 left-0 right-0 z-20 bg-white/95 backdrop-blur-lg border-b border-gray-100 px-4 py-3">
+        <div className="flex items-center justify-between max-w-md mx-auto">
           <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
+            <div className="w-8 h-8 bg-gradient-to-r from-pink-500 to-orange-500 rounded-xl flex items-center justify-center shadow-md">
               <span className="text-white text-sm font-bold">1D</span>
             </div>
-            <h1 className="text-gray-800 font-bold text-lg">1DaySocial</h1>
+            <h1 className="text-gray-900 font-bold text-lg">1DaySocial</h1>
           </div>
           <div className="flex items-center space-x-2">
-            <Badge className="bg-yellow-100 text-yellow-800 border-yellow-300">
+            <Badge className="bg-yellow-50 text-yellow-700 border-yellow-200 shadow-sm">
               <Star className="h-3 w-3 mr-1" />
               {userPoints}
             </Badge>
-            <Button variant="ghost" size="icon" className="text-gray-600 hover:text-gray-800">
+            <Button variant="ghost" size="icon" className="text-gray-600 hover:text-gray-900 hover:bg-gray-100">
               <Search className="h-5 w-5" />
-            </Button>
-            <Button variant="ghost" size="icon" className="text-gray-600 hover:text-gray-800">
-              <Bell className="h-5 w-5" />
             </Button>
           </div>
         </div>
       </div>
 
-      <div className="max-w-4xl mx-auto">
-        {/* Stories */}
+      {/* Stories Section */}
+      <div className="fixed top-16 left-0 right-0 z-10 bg-white">
         <Stories />
+      </div>
 
-        {/* 24-Hour System Info */}
-        <div className="p-4">
-          <Card className="bg-gradient-to-r from-orange-50 to-yellow-50 border-orange-200">
-            <CardContent className="p-4">
-              <div className="flex items-center space-x-2 text-orange-700">
-                <Clock className="h-5 w-5" />
-                <div>
-                  <p className="font-semibold">24-Hour Social System</p>
-                  <p className="text-sm">Messages, chats, and connections reset every 24 hours. Earn points to unlock new conversations!</p>
+      {/* Vertical Feed Container */}
+      <div 
+        ref={containerRef}
+        className="pt-32 pb-20 h-screen overflow-y-auto scroll-smooth snap-y snap-mandatory"
+        onScroll={handleScroll}
+        style={{ scrollBehavior: 'smooth' }}
+      >
+        {posts.map((post, index) => (
+          <div 
+            key={post.id} 
+            className="relative h-screen snap-start flex items-center justify-center bg-gray-50"
+          >
+            {/* Post Content */}
+            <div className="relative w-full max-w-md mx-auto h-full">
+              {/* Background Image */}
+              {post.image && (
+                <div className="absolute inset-0">
+                  <img 
+                    src={post.image}
+                    alt="Post content"
+                    className="w-full h-full object-cover rounded-none"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20"></div>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Create Post */}
-        <div className="p-4">
-          <Card className="bg-white/80 border-gray-200">
-            <CardContent className="p-4">
-              <div className="flex items-center space-x-4">
-                <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
-                  <span className="text-white text-sm font-bold">You</span>
-                </div>
-                <div 
-                  className="flex-1 bg-gray-100 rounded-full px-4 py-2 cursor-pointer hover:bg-gray-200 transition-colors"
-                  onClick={() => navigate('/create')}
-                >
-                  <p className="text-gray-500">What's on your mind today?</p>
-                </div>
-                <Button variant="ghost" size="icon" className="text-gray-600">
-                  <Camera className="h-5 w-5" />
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Posts */}
-        <div className="p-4 space-y-6 pb-20">
-          {posts.map(post => (
-            <Card key={post.id} className="bg-white/80 border-gray-200 hover:shadow-lg transition-shadow">
-              <CardContent className="p-0">
-                {/* Post Header */}
-                <div className="p-4 flex items-center justify-between">
+              )}
+              
+              {/* Content Overlay */}
+              <div className="absolute inset-0 flex flex-col justify-between p-4 text-white">
+                {/* Top Section - User Info */}
+                <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-3">
-                    <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center text-lg">
+                    <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center text-2xl border-2 border-white shadow-lg">
                       {post.user.avatar}
                     </div>
                     <div>
                       <div className="flex items-center space-x-2">
-                        <h3 className="text-gray-800 font-semibold">{post.user.name}</h3>
-                        {post.user.isVerified && <Badge className="bg-blue-100 text-blue-700 text-xs">✓</Badge>}
-                        <Badge className="bg-purple-100 text-purple-700 text-xs">{post.user.hobby}</Badge>
+                        <h3 className="text-white font-semibold text-lg drop-shadow-lg">{post.user.name}</h3>
+                        {post.user.isVerified && <Badge className="bg-blue-500 text-white text-xs">✓</Badge>}
                       </div>
-                      <p className="text-gray-500 text-sm">{post.timeAgo}</p>
+                      <Badge className="bg-white/20 text-white text-xs backdrop-blur-sm">{post.user.hobby}</Badge>
                     </div>
                   </div>
-                  <Button variant="ghost" size="icon" className="text-gray-400">
-                    <MoreVertical className="h-4 w-4" />
+                  <Button variant="ghost" size="icon" className="text-white hover:bg-white/20">
+                    <MoreVertical className="h-5 w-5" />
                   </Button>
                 </div>
 
-                {/* Post Content */}
-                <div className="px-4 pb-3">
-                  <p className="text-gray-800">{post.content}</p>
-                </div>
-
-                {/* Post Image */}
-                {post.image && (
-                  <div className="mb-4">
-                    <img 
-                      src={post.image} 
-                      alt="Post content" 
-                      className="w-full h-64 object-cover"
-                    />
+                {/* Bottom Section - Content & Actions */}
+                <div className="space-y-4">
+                  {/* Post Text */}
+                  <div className="bg-black/30 backdrop-blur-sm rounded-2xl p-4">
+                    <p className="text-white text-lg leading-relaxed drop-shadow-lg">{post.content}</p>
+                    <p className="text-white/80 text-sm mt-2">{post.timeAgo}</p>
                   </div>
-                )}
-
-                {/* Post Actions */}
-                <div className="px-4 pb-4">
-                  <div className="flex items-center justify-between border-t border-gray-100 pt-3">
+                  
+                  {/* Action Buttons */}
+                  <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-6">
                       <Button
                         variant="ghost"
                         size="sm"
-                        className={`${post.isLiked ? 'text-red-500' : 'text-gray-600'} hover:text-red-500`}
+                        className={`text-white hover:bg-white/20 ${post.isLiked ? 'text-red-400' : ''}`}
                         onClick={() => toggleLike(post.id)}
                       >
-                        <Heart className={`h-4 w-4 mr-1 ${post.isLiked ? 'fill-current' : ''}`} />
-                        {post.likes}
+                        <Heart className={`h-6 w-6 mr-2 ${post.isLiked ? 'fill-current' : ''}`} />
+                        <span className="font-semibold">{post.likes}</span>
                       </Button>
-                      <Button variant="ghost" size="sm" className="text-gray-600 hover:text-blue-500">
-                        <MessageCircle className="h-4 w-4 mr-1" />
-                        {post.comments}
+                      <Button variant="ghost" size="sm" className="text-white hover:bg-white/20">
+                        <MessageCircle className="h-6 w-6 mr-2" />
+                        <span className="font-semibold">{post.comments}</span>
                       </Button>
-                      <Button variant="ghost" size="sm" className="text-gray-600 hover:text-green-500">
-                        <Share2 className="h-4 w-4 mr-1" />
-                        {post.shares}
+                      <Button variant="ghost" size="sm" className="text-white hover:bg-white/20">
+                        <Share2 className="h-6 w-6 mr-2" />
+                        <span className="font-semibold">{post.shares}</span>
                       </Button>
                     </div>
+                    <Button className="bg-gradient-to-r from-pink-500 to-orange-500 hover:from-pink-600 hover:to-orange-600 text-white font-semibold px-6 py-2 rounded-full shadow-lg">
+                      <UserPlus className="h-4 w-4 mr-2" />
+                      Follow
+                    </Button>
                   </div>
                 </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+              </div>
+
+              {/* Scroll Indicator */}
+              <div className="absolute right-4 top-1/2 transform -translate-y-1/2 flex flex-col space-y-2">
+                {posts.map((_, idx) => (
+                  <div
+                    key={idx}
+                    className={`w-1 h-8 rounded-full transition-all duration-300 ${
+                      idx === currentPostIndex ? 'bg-white' : 'bg-white/30'
+                    }`}
+                  />
+                ))}
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* 24-Hour System Reminder */}
+      <div className="fixed bottom-20 left-4 right-4 z-10">
+        <Card className="bg-gradient-to-r from-orange-50 to-yellow-50 border-orange-200 shadow-lg">
+          <CardContent className="p-3">
+            <div className="flex items-center space-x-2 text-orange-700">
+              <Clock className="h-4 w-4" />
+              <p className="text-xs font-medium">24-Hour Social System - All connections reset daily!</p>
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
       <BottomNavigation />

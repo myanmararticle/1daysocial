@@ -24,16 +24,16 @@ const Stories = () => {
   ];
 
   return (
-    <div className="p-4 border-b border-gray-200 bg-white/60">
+    <div className="p-4 bg-white border-b border-gray-100">
       <div className="flex space-x-4 overflow-x-auto pb-2">
         {stories.map((story) => (
           <div key={story.id} className="flex-shrink-0 text-center">
-            <div className={`relative p-1 rounded-full ${
+            <div className={`relative p-0.5 rounded-full ${
               story.isOwn 
-                ? 'bg-gradient-to-r from-purple-500 to-pink-500' 
+                ? 'bg-gradient-to-r from-pink-500 to-orange-500' 
                 : story.isViewed 
                   ? 'bg-gradient-to-r from-gray-300 to-gray-400' 
-                  : 'bg-gradient-to-r from-purple-500 to-pink-500'
+                  : 'bg-gradient-to-r from-pink-500 to-orange-500'
             }`}>
               <Avatar className="w-16 h-16 border-2 border-white">
                 {story.isOwn ? (
@@ -41,11 +41,9 @@ const Stories = () => {
                     <Plus className="h-6 w-6 text-gray-600" />
                   </div>
                 ) : (
-                  <>
-                    <div className="w-full h-full bg-gray-100 flex items-center justify-center rounded-full text-2xl">
-                      {story.user.avatar}
-                    </div>
-                  </>
+                  <div className="w-full h-full bg-gray-100 flex items-center justify-center rounded-full text-2xl">
+                    {story.user.avatar}
+                  </div>
                 )}
               </Avatar>
               {story.isOwn && (
@@ -54,7 +52,7 @@ const Stories = () => {
                 </div>
               )}
             </div>
-            <p className="text-xs text-gray-600 mt-2 max-w-[64px] truncate">
+            <p className="text-xs text-gray-600 mt-2 max-w-[64px] truncate font-medium">
               {story.user.name}
             </p>
           </div>
