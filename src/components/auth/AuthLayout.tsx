@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -64,7 +63,7 @@ const AuthLayout = ({ onAuthSuccess }: { onAuthSuccess: () => void }) => {
               </div>
               <div className="text-left">
                 <h3 className="font-semibold text-white">24-Hour Connections</h3>
-                <p className="text-white/80 text-sm">အဓိပ္పါယ်ရှိသော စကားဝိုင်းများ ပြုလုပ်ပါ</p>
+                <p className="text-white/80 text-sm">အဓိပ္ပါယ်ရှိသော စကားဝိုင်းများ ပြုလုပ်ပါ</p>
               </div>
             </div>
 
@@ -197,7 +196,7 @@ const AuthLayout = ({ onAuthSuccess }: { onAuthSuccess: () => void }) => {
                         <Checkbox 
                           id="remember" 
                           checked={rememberMe}
-                          onCheckedChange={setRememberMe}
+                          onCheckedChange={(checked) => setRememberMe(checked === true)}
                           className="border-gray-300"
                         />
                         <label htmlFor="remember" className="text-sm text-gray-600">
