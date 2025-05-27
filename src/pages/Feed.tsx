@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { 
   Heart, 
@@ -13,23 +13,20 @@ import {
   Search,
   Bell,
   Plus,
-  Home,
-  Users,
-  User,
-  Settings
+  Star,
+  Clock
 } from "lucide-react";
 import { useNavigate } from 'react-router-dom';
 import BottomNavigation from '@/components/BottomNavigation';
 import Stories from '@/components/Stories';
-import PostCard from '@/components/PostCard';
 
 interface Post {
   id: number;
   user: {
     name: string;
-    username: string;
     avatar: string;
     isVerified: boolean;
+    hobby: string;
   };
   content: string;
   image?: string;
@@ -38,78 +35,58 @@ interface Post {
   shares: number;
   timeAgo: string;
   isLiked: boolean;
-  location?: string;
 }
 
 const Feed = () => {
   const navigate = useNavigate();
+  const [userPoints] = useState(150);
   const [posts, setPosts] = useState<Post[]>([
     {
       id: 1,
       user: {
         name: "မင်းမင်း",
-        username: "@minmin_gamer",
-        avatar: "https://images.unsplash.com/photo-1649972904349-6e44c42644a7?w=100&h=100&fit=crop&crop=face",
-        isVerified: true
+        avatar: "🎮",
+        isVerified: true,
+        hobby: "Gaming"
       },
-      content: "Gaming tournament မှာ championship ရခဲ့တယ်! အားပေးကြတဲ့လူတွေကို ကျေးဇူးတင်ပါတယ် 🏆🎮✨",
-      image: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=500&h=300&fit=crop",
-      likes: 247,
-      comments: 38,
-      shares: 15,
+      content: "Gaming tournament မှာ ပါဝင်နေတယ်! သူငယ်ချင်းတွေ ကံကောင်းပါစေ 🎯 ဘယ်သူတွေ ကြည့်နေလဲ?",
+      image: "https://images.unsplash.com/photo-1542751371-adc38448a05e?w=500&h=300&fit=crop",
+      likes: 24,
+      comments: 8,
+      shares: 3,
       timeAgo: "2h ago",
-      isLiked: false,
-      location: "Yangon Gaming Arena"
+      isLiked: false
     },
     {
       id: 2,
       user: {
         name: "သူဇာ",
-        username: "@suza_movie",
-        avatar: "https://images.unsplash.com/photo-1649972904349-6e44c42644a7?w=100&h=100&fit=crop&crop=face",
-        isVerified: false
+        avatar: "🎬",
+        isVerified: false,
+        hobby: "Movies"
       },
-      content: "ဒီနေ့ sunset က အရမ်းလှတယ်! Nature photography က ကိုယ့်ရဲ့ passion လေး 📸🌅",
-      image: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=500&h=300&fit=crop",
-      likes: 189,
-      comments: 25,
-      shares: 8,
+      content: "နောက်ဆုံးထွက်တဲ့ Marvel ရုပ်ရှင်ကြည့်ပြီးပြီ။ အရမ်းကောင်းတယ်! ဘယ်သူတွေကြည့်ပြီးပြီလဲ? spoiler မပေးပါနဲ့နော် 🍿✨",
+      likes: 45,
+      comments: 12,
+      shares: 7,
       timeAgo: "4h ago",
-      isLiked: true,
-      location: "Kandawgyi Lake"
+      isLiked: true
     },
     {
       id: 3,
       user: {
         name: "အောင်အောင်",
-        username: "@aung_sports",
-        avatar: "https://images.unsplash.com/photo-1649972904349-6e44c42644a7?w=100&h=100&fit=crop&crop=face",
-        isVerified: false
+        avatar: "⚽",
+        isVerified: false,
+        hobby: "Sports"
       },
-      content: "Morning workout ပြီးပြီ! Healthy lifestyle က အရေးကြီးတယ်နော် 💪🏃‍♂️",
-      likes: 156,
-      comments: 42,
-      shares: 12,
+      content: "ဒီနေ့ညနေ ဘောလုံးပွဲကြည့်မယ်။ ဘယ်တီးမကိုင်းမလဲ? စိုစိုရွှမ်းရွှမ်း ဖြစ်နေပြီ 🏆⚽",
+      image: "https://images.unsplash.com/photo-1522778119026-d647f0596c20?w=500&h=300&fit=crop",
+      likes: 31,
+      comments: 18,
+      shares: 5,
       timeAgo: "6h ago",
-      isLiked: false,
-      location: "Inya Lake Park"
-    },
-    {
-      id: 4,
-      user: {
-        name: "မေမေ",
-        username: "@may_foodie",
-        avatar: "https://images.unsplash.com/photo-1649972904349-6e44c42644a7?w=100&h=100&fit=crop&crop=face",
-        isVerified: true
-      },
-      content: "ဒီနေ့ cook လုပ်တဲ့ မွန်လူမျိုး traditional food! Recipe ကို share လုပ်မလား? 🍛👩‍🍳",
-      image: "https://images.unsplash.com/photo-1518495973542-4542c06a5843?w=500&h=300&fit=crop",
-      likes: 203,
-      comments: 67,
-      shares: 23,
-      timeAgo: "8h ago",
-      isLiked: true,
-      location: "Home Kitchen"
+      isLiked: false
     }
   ]);
 
@@ -126,66 +103,143 @@ const Feed = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50">
       {/* Header */}
-      <div className="sticky top-0 z-20 bg-black/20 backdrop-blur-xl border-b border-white/10">
-        <div className="flex items-center justify-between p-4">
+      <div className="sticky top-0 z-10 bg-white/90 backdrop-blur-lg border-b border-gray-200 p-4">
+        <div className="max-w-4xl mx-auto flex items-center justify-between">
           <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-gradient-to-r from-pink-500 to-violet-500 rounded-2xl flex items-center justify-center shadow-lg">
-              <span className="text-white text-lg font-bold">1D</span>
+            <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
+              <span className="text-white text-sm font-bold">1D</span>
             </div>
-            <div>
-              <h1 className="text-white font-bold text-xl">1DaySocial</h1>
-              <p className="text-white/60 text-xs">Connect & Share</p>
-            </div>
+            <h1 className="text-gray-800 font-bold text-lg">1DaySocial</h1>
           </div>
           <div className="flex items-center space-x-2">
-            <Button variant="ghost" size="icon" className="text-white/60 hover:text-white hover:bg-white/10 rounded-full">
+            <Badge className="bg-yellow-100 text-yellow-800 border-yellow-300">
+              <Star className="h-3 w-3 mr-1" />
+              {userPoints}
+            </Badge>
+            <Button variant="ghost" size="icon" className="text-gray-600 hover:text-gray-800">
               <Search className="h-5 w-5" />
             </Button>
-            <Button variant="ghost" size="icon" className="text-white/60 hover:text-white hover:bg-white/10 rounded-full">
+            <Button variant="ghost" size="icon" className="text-gray-600 hover:text-gray-800">
               <Bell className="h-5 w-5" />
             </Button>
           </div>
         </div>
       </div>
 
-      {/* Stories Section */}
-      <Stories />
+      <div className="max-w-4xl mx-auto">
+        {/* Stories */}
+        <Stories />
 
-      {/* Create Post */}
-      <div className="p-4">
-        <Card className="bg-white/10 backdrop-blur-lg border-white/20 shadow-xl">
-          <CardContent className="p-4">
-            <div className="flex items-center space-x-3">
-              <Avatar className="w-10 h-10">
-                <AvatarImage src="https://images.unsplash.com/photo-1649972904349-6e44c42644a7?w=100&h=100&fit=crop&crop=face" />
-                <AvatarFallback className="bg-gradient-to-r from-pink-500 to-violet-500 text-white">You</AvatarFallback>
-              </Avatar>
-              <Input 
-                placeholder="What's on your mind?" 
-                className="bg-white/10 border-white/20 text-white placeholder:text-white/60 rounded-full flex-1"
-              />
-              <Button size="icon" className="bg-gradient-to-r from-pink-500 to-violet-500 hover:from-pink-600 hover:to-violet-600 rounded-full shadow-lg">
-                <Camera className="h-4 w-4" />
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+        {/* 24-Hour System Info */}
+        <div className="p-4">
+          <Card className="bg-gradient-to-r from-orange-50 to-yellow-50 border-orange-200">
+            <CardContent className="p-4">
+              <div className="flex items-center space-x-2 text-orange-700">
+                <Clock className="h-5 w-5" />
+                <div>
+                  <p className="font-semibold">24-Hour Social System</p>
+                  <p className="text-sm">Messages, chats, and connections reset every 24 hours. Earn points to unlock new conversations!</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Create Post */}
+        <div className="p-4">
+          <Card className="bg-white/80 border-gray-200">
+            <CardContent className="p-4">
+              <div className="flex items-center space-x-4">
+                <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
+                  <span className="text-white text-sm font-bold">You</span>
+                </div>
+                <div 
+                  className="flex-1 bg-gray-100 rounded-full px-4 py-2 cursor-pointer hover:bg-gray-200 transition-colors"
+                  onClick={() => navigate('/create')}
+                >
+                  <p className="text-gray-500">What's on your mind today?</p>
+                </div>
+                <Button variant="ghost" size="icon" className="text-gray-600">
+                  <Camera className="h-5 w-5" />
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Posts */}
+        <div className="p-4 space-y-6 pb-20">
+          {posts.map(post => (
+            <Card key={post.id} className="bg-white/80 border-gray-200 hover:shadow-lg transition-shadow">
+              <CardContent className="p-0">
+                {/* Post Header */}
+                <div className="p-4 flex items-center justify-between">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center text-lg">
+                      {post.user.avatar}
+                    </div>
+                    <div>
+                      <div className="flex items-center space-x-2">
+                        <h3 className="text-gray-800 font-semibold">{post.user.name}</h3>
+                        {post.user.isVerified && <Badge className="bg-blue-100 text-blue-700 text-xs">✓</Badge>}
+                        <Badge className="bg-purple-100 text-purple-700 text-xs">{post.user.hobby}</Badge>
+                      </div>
+                      <p className="text-gray-500 text-sm">{post.timeAgo}</p>
+                    </div>
+                  </div>
+                  <Button variant="ghost" size="icon" className="text-gray-400">
+                    <MoreVertical className="h-4 w-4" />
+                  </Button>
+                </div>
+
+                {/* Post Content */}
+                <div className="px-4 pb-3">
+                  <p className="text-gray-800">{post.content}</p>
+                </div>
+
+                {/* Post Image */}
+                {post.image && (
+                  <div className="mb-4">
+                    <img 
+                      src={post.image} 
+                      alt="Post content" 
+                      className="w-full h-64 object-cover"
+                    />
+                  </div>
+                )}
+
+                {/* Post Actions */}
+                <div className="px-4 pb-4">
+                  <div className="flex items-center justify-between border-t border-gray-100 pt-3">
+                    <div className="flex items-center space-x-6">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className={`${post.isLiked ? 'text-red-500' : 'text-gray-600'} hover:text-red-500`}
+                        onClick={() => toggleLike(post.id)}
+                      >
+                        <Heart className={`h-4 w-4 mr-1 ${post.isLiked ? 'fill-current' : ''}`} />
+                        {post.likes}
+                      </Button>
+                      <Button variant="ghost" size="sm" className="text-gray-600 hover:text-blue-500">
+                        <MessageCircle className="h-4 w-4 mr-1" />
+                        {post.comments}
+                      </Button>
+                      <Button variant="ghost" size="sm" className="text-gray-600 hover:text-green-500">
+                        <Share2 className="h-4 w-4 mr-1" />
+                        {post.shares}
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
       </div>
 
-      {/* Posts */}
-      <div className="px-4 pb-20 space-y-4">
-        {posts.map((post) => (
-          <PostCard 
-            key={post.id} 
-            post={post} 
-            onToggleLike={() => toggleLike(post.id)}
-          />
-        ))}
-      </div>
-
-      {/* Bottom Navigation */}
       <BottomNavigation />
     </div>
   );
