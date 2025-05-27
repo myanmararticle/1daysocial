@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -17,15 +17,42 @@ import {
   Paperclip,
   Phone,
   Video,
-  MoreVertical
+  MoreVertical,
+  Plus,
+  Star,
+  Shield,
+  Heart,
+  Zap
 } from "lucide-react";
+
+interface Message {
+  id: number;
+  text: string;
+  time: string;
+  sender: 'me' | 'other';
+  type: 'text' | 'emoji' | 'image';
+}
+
+interface Chat {
+  id: number;
+  name: string;
+  lastMessage: string;
+  time: string;
+  avatar: string;
+  hobby: string;
+  timeLeft: string;
+  unread: number;
+  online: boolean;
+}
 
 const ChatDashboard = ({ onLogout }: { onLogout: () => void }) => {
   const [selectedChat, setSelectedChat] = useState(0);
   const [message, setMessage] = useState('');
   const [points, setPoints] = useState(150);
+  const [isTyping, setIsTyping] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const chats = [
+  const [chats] = useState<Chat[]>([
     {
       id: 1,
       name: "Alex K.",
@@ -58,10 +85,21 @@ const ChatDashboard = ({ onLogout }: { onLogout: () => void }) => {
       timeLeft: "15h 20m",
       unread: 1,
       online: true
+    },
+    {
+      id: 4,
+      name: "Maya L.",
+      lastMessage: "Thanks for the music recommendation!",
+      time: "Yesterday",
+      avatar: "🎵",
+      hobby: "Music",
+      timeLeft: "8h 45m",
+      unread: 0,
+      online: true
     }
-  ];
+  ]);
 
-  const messages = [
+  const [messages, setMessages] = useState<Message[]>([
     {
       id: 1,
       text: "Hey! How's your day going?",
@@ -78,36 +116,89 @@ const ChatDashboard = ({ onLogout }: { onLogout: () => void }) => {
     },
     {
       id: 3,
-      text: "Same here! Want to play a quick game?",
+      text: "Same here! Want to play a quick game? 🎮",
       time: "2:33 PM",
       sender: "other",
       type: "text"
+    },
+    {
+      id: 4,
+      text: "Sure! What game do you have in mind?",
+      time: "2:34 PM",
+      sender: "me",
+      type: "text"
     }
-  ];
+  ]);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
 
   const sendMessage = () => {
     if (message.trim()) {
-      // Add message logic here
+      const newMessage: Message = {
+        id: messages.length + 1,
+        text: message,
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        sender: "me",
+        type: "text"
+      };
+      
+      setMessages([...messages, newMessage]);
       setMessage('');
+      
+      // Simulate typing indicator
+      setIsTyping(true);
+      setTimeout(() => {
+        setIsTyping(false);
+        // Add a random response
+        const responses = [
+          "That's interesting! 😊",
+          "မင်းကြောင့်ပျော်တယ်! 🎉",
+          "Tell me more about that!",
+          "အဲဒါကောင်းတယ်နော်!",
+          "Sounds fun! 🎮"
+        ];
+        const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+        const responseMessage: Message = {
+          id: messages.length + 2,
+          text: randomResponse,
+          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          sender: "other",
+          type: "text"
+        };
+        setMessages(prev => [...prev, responseMessage]);
+      }, 2000);
+    }
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage();
     }
   };
 
   return (
-    <div className="h-screen bg-slate-900 flex flex-col md:flex-row">
+    <div className="h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex flex-col md:flex-row animate-fade-in">
       {/* Sidebar */}
-      <div className="w-full md:w-80 bg-slate-800 border-r border-slate-700 flex flex-col">
+      <div className="w-full md:w-80 bg-slate-800/90 backdrop-blur-lg border-r border-slate-700/50 flex flex-col">
         {/* Header */}
-        <div className="p-4 border-b border-slate-700">
+        <div className="p-4 border-b border-slate-700/50">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl flex items-center justify-center">
+              <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl flex items-center justify-center shadow-lg animate-scale-in">
                 <MessageCircle className="h-5 w-5 text-white" />
               </div>
               <div>
-                <h1 className="text-white font-semibold">1DaySocial</h1>
+                <h1 className="text-white font-semibold text-lg">1DaySocial</h1>
                 <div className="flex items-center space-x-2">
                   <Gift className="h-3 w-3 text-yellow-500" />
-                  <span className="text-xs text-yellow-500">{points} Points</span>
+                  <span className="text-xs text-yellow-500 font-medium">{points} Points</span>
                 </div>
               </div>
             </div>
@@ -115,7 +206,7 @@ const ChatDashboard = ({ onLogout }: { onLogout: () => void }) => {
               variant="ghost" 
               size="icon"
               onClick={onLogout}
-              className="text-slate-400 hover:text-white"
+              className="text-slate-400 hover:text-white hover:bg-slate-700/50 transition-all duration-200"
             >
               <LogOut className="h-4 w-4" />
             </Button>
@@ -125,8 +216,36 @@ const ChatDashboard = ({ onLogout }: { onLogout: () => void }) => {
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
             <Input 
               placeholder="Search chats..."
-              className="pl-10 bg-slate-700 border-slate-600 text-white placeholder-slate-400"
+              className="pl-10 bg-slate-700/50 border-slate-600 text-white placeholder-slate-400 focus:bg-slate-700 transition-all duration-200"
             />
+          </div>
+        </div>
+
+        {/* Stats Cards */}
+        <div className="p-4 border-b border-slate-700/50">
+          <div className="grid grid-cols-2 gap-3">
+            <Card className="bg-gradient-to-r from-blue-500/10 to-indigo-500/10 border-blue-500/20">
+              <CardContent className="p-3">
+                <div className="flex items-center space-x-2">
+                  <Users className="h-4 w-4 text-blue-400" />
+                  <div>
+                    <p className="text-xs text-slate-400">Active Chats</p>
+                    <p className="text-sm font-semibold text-white">{chats.length}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            <Card className="bg-gradient-to-r from-green-500/10 to-emerald-500/10 border-green-500/20">
+              <CardContent className="p-3">
+                <div className="flex items-center space-x-2">
+                  <Clock className="h-4 w-4 text-green-400" />
+                  <div>
+                    <p className="text-xs text-slate-400">Time Left</p>
+                    <p className="text-sm font-semibold text-white">18h 30m</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </div>
 
@@ -136,17 +255,17 @@ const ChatDashboard = ({ onLogout }: { onLogout: () => void }) => {
             <div
               key={chat.id}
               onClick={() => setSelectedChat(index)}
-              className={`p-4 border-b border-slate-700 cursor-pointer hover:bg-slate-700/50 transition-colors ${
-                selectedChat === index ? 'bg-slate-700' : ''
+              className={`p-4 border-b border-slate-700/50 cursor-pointer hover:bg-slate-700/30 transition-all duration-200 ${
+                selectedChat === index ? 'bg-slate-700/50 border-l-4 border-l-purple-500' : ''
               }`}
             >
               <div className="flex items-center space-x-3">
                 <div className="relative">
-                  <div className="w-12 h-12 bg-slate-600 rounded-xl flex items-center justify-center text-lg">
+                  <div className="w-12 h-12 bg-slate-600 rounded-xl flex items-center justify-center text-lg shadow-md">
                     {chat.avatar}
                   </div>
                   {chat.online && (
-                    <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-slate-800"></div>
+                    <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-slate-800 animate-pulse"></div>
                   )}
                 </div>
                 <div className="flex-1 min-w-0">
@@ -154,7 +273,7 @@ const ChatDashboard = ({ onLogout }: { onLogout: () => void }) => {
                     <h3 className="text-white font-medium truncate">{chat.name}</h3>
                     <div className="flex items-center space-x-2">
                       {chat.unread > 0 && (
-                        <Badge className="bg-purple-500 text-white text-xs">{chat.unread}</Badge>
+                        <Badge className="bg-purple-500 text-white text-xs animate-pulse">{chat.unread}</Badge>
                       )}
                       <span className="text-xs text-slate-400">{chat.time}</span>
                     </div>
@@ -176,16 +295,26 @@ const ChatDashboard = ({ onLogout }: { onLogout: () => void }) => {
         </div>
 
         {/* Quick Actions */}
-        <div className="p-4 border-t border-slate-700">
-          <div className="grid grid-cols-2 gap-2">
-            <Button variant="outline" size="sm" className="border-slate-600 text-slate-300 hover:bg-slate-700">
-              <Users className="h-4 w-4 mr-2" />
-              Find Match
+        <div className="p-4 border-t border-slate-700/50">
+          <div className="grid grid-cols-1 gap-3">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="border-slate-600 text-slate-300 hover:bg-gradient-to-r hover:from-purple-500/20 hover:to-pink-500/20 hover:border-purple-500/50 transition-all duration-300"
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Find New Match
             </Button>
-            <Button variant="outline" size="sm" className="border-slate-600 text-slate-300 hover:bg-slate-700">
-              <Gift className="h-4 w-4 mr-2" />
-              Earn Points
-            </Button>
+            <div className="grid grid-cols-2 gap-2">
+              <Button variant="outline" size="sm" className="border-slate-600 text-slate-300 hover:bg-slate-700">
+                <Gift className="h-4 w-4 mr-1" />
+                Earn
+              </Button>
+              <Button variant="outline" size="sm" className="border-slate-600 text-slate-300 hover:bg-slate-700">
+                <Star className="h-4 w-4 mr-1" />
+                Rate
+              </Button>
+            </div>
           </div>
         </div>
       </div>
@@ -193,7 +322,7 @@ const ChatDashboard = ({ onLogout }: { onLogout: () => void }) => {
       {/* Chat Area */}
       <div className="flex-1 flex flex-col">
         {/* Chat Header */}
-        <div className="p-4 bg-slate-800 border-b border-slate-700 flex items-center justify-between">
+        <div className="p-4 bg-slate-800/90 backdrop-blur-lg border-b border-slate-700/50 flex items-center justify-between">
           <div className="flex items-center space-x-3">
             <div className="relative">
               <div className="w-10 h-10 bg-slate-600 rounded-xl flex items-center justify-center text-lg">
@@ -208,38 +337,42 @@ const ChatDashboard = ({ onLogout }: { onLogout: () => void }) => {
               <div className="flex items-center space-x-2 text-xs text-slate-400">
                 <Clock className="h-3 w-3" />
                 <span>Time left: {chats[selectedChat]?.timeLeft}</span>
+                <span className="text-green-400">• Online</span>
               </div>
             </div>
           </div>
           <div className="flex items-center space-x-2">
-            <Button variant="ghost" size="icon" className="text-slate-400 hover:text-white">
+            <Button variant="ghost" size="icon" className="text-slate-400 hover:text-white hover:bg-slate-700/50">
               <Phone className="h-4 w-4" />
             </Button>
-            <Button variant="ghost" size="icon" className="text-slate-400 hover:text-white">
+            <Button variant="ghost" size="icon" className="text-slate-400 hover:text-white hover:bg-slate-700/50">
               <Video className="h-4 w-4" />
             </Button>
-            <Button variant="ghost" size="icon" className="text-slate-400 hover:text-white">
+            <Button variant="ghost" size="icon" className="text-slate-400 hover:text-white hover:bg-slate-700/50">
+              <Shield className="h-4 w-4" />
+            </Button>
+            <Button variant="ghost" size="icon" className="text-slate-400 hover:text-white hover:bg-slate-700/50">
               <MoreVertical className="h-4 w-4" />
             </Button>
           </div>
         </div>
 
         {/* Messages */}
-        <div className="flex-1 overflow-y-auto p-4 space-y-4">
+        <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gradient-to-b from-slate-900/50 to-slate-800/30">
           {messages.map((msg) => (
             <div
               key={msg.id}
-              className={`flex ${msg.sender === 'me' ? 'justify-end' : 'justify-start'}`}
+              className={`flex ${msg.sender === 'me' ? 'justify-end' : 'justify-start'} animate-fade-in`}
             >
               <div
-                className={`max-w-xs lg:max-w-md px-4 py-2 rounded-2xl ${
+                className={`max-w-xs lg:max-w-md px-4 py-3 rounded-2xl shadow-lg ${
                   msg.sender === 'me'
                     ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white'
-                    : 'bg-slate-700 text-white'
+                    : 'bg-slate-700/80 backdrop-blur-sm text-white border border-slate-600/50'
                 }`}
               >
-                <p className="text-sm">{msg.text}</p>
-                <p className={`text-xs mt-1 ${
+                <p className="text-sm leading-relaxed">{msg.text}</p>
+                <p className={`text-xs mt-2 ${
                   msg.sender === 'me' ? 'text-purple-100' : 'text-slate-400'
                 }`}>
                   {msg.time}
@@ -247,21 +380,36 @@ const ChatDashboard = ({ onLogout }: { onLogout: () => void }) => {
               </div>
             </div>
           ))}
+          
+          {/* Typing Indicator */}
+          {isTyping && (
+            <div className="flex justify-start animate-fade-in">
+              <div className="bg-slate-700/80 backdrop-blur-sm border border-slate-600/50 px-4 py-3 rounded-2xl shadow-lg">
+                <div className="flex space-x-1">
+                  <div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce"></div>
+                  <div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                  <div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                </div>
+              </div>
+            </div>
+          )}
+          
+          <div ref={messagesEndRef} />
         </div>
 
         {/* Message Input */}
-        <div className="p-4 bg-slate-800 border-t border-slate-700">
-          <div className="flex items-center space-x-2">
-            <Button variant="ghost" size="icon" className="text-slate-400 hover:text-white">
+        <div className="p-4 bg-slate-800/90 backdrop-blur-lg border-t border-slate-700/50">
+          <div className="flex items-center space-x-3">
+            <Button variant="ghost" size="icon" className="text-slate-400 hover:text-white hover:bg-slate-700/50">
               <Paperclip className="h-4 w-4" />
             </Button>
             <div className="flex-1 relative">
               <Input
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
-                placeholder="Type a message..."
-                className="bg-slate-700 border-slate-600 text-white placeholder-slate-400 pr-10"
-                onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
+                onKeyPress={handleKeyPress}
+                placeholder="Type a message... (Press Enter to send)"
+                className="bg-slate-700/50 border-slate-600 text-white placeholder-slate-400 pr-12 focus:bg-slate-700 transition-all duration-200"
               />
               <Button
                 variant="ghost"
@@ -273,10 +421,27 @@ const ChatDashboard = ({ onLogout }: { onLogout: () => void }) => {
             </div>
             <Button 
               onClick={sendMessage}
-              className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
+              disabled={!message.trim()}
+              className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg transition-all duration-200"
             >
               <Send className="h-4 w-4" />
             </Button>
+          </div>
+          
+          {/* Quick Reactions */}
+          <div className="flex items-center space-x-2 mt-3">
+            <span className="text-xs text-slate-400">Quick:</span>
+            {['👍', '❤️', '😊', '🎉', '🔥'].map((emoji) => (
+              <Button
+                key={emoji}
+                variant="ghost"
+                size="sm"
+                className="text-lg hover:bg-slate-700/50 p-1 h-8 w-8"
+                onClick={() => setMessage(message + emoji)}
+              >
+                {emoji}
+              </Button>
+            ))}
           </div>
         </div>
       </div>
