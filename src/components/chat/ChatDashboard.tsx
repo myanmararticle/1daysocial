@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -22,8 +21,11 @@ import {
   Star,
   Shield,
   Heart,
-  Zap
+  Zap,
+  Gamepad2,
+  UserCheck
 } from "lucide-react";
+import { useNavigate } from 'react-router-dom';
 
 interface Message {
   id: number;
@@ -46,6 +48,7 @@ interface Chat {
 }
 
 const ChatDashboard = ({ onLogout }: { onLogout: () => void }) => {
+  const navigate = useNavigate();
   const [selectedChat, setSelectedChat] = useState(0);
   const [message, setMessage] = useState('');
   const [points, setPoints] = useState(150);
@@ -294,27 +297,61 @@ const ChatDashboard = ({ onLogout }: { onLogout: () => void }) => {
           ))}
         </div>
 
-        {/* Quick Actions */}
+        {/* Navigation Menu */}
         <div className="p-4 border-t border-slate-700/50">
           <div className="grid grid-cols-1 gap-3">
             <Button 
               variant="outline" 
               size="sm" 
               className="border-slate-600 text-slate-300 hover:bg-gradient-to-r hover:from-purple-500/20 hover:to-pink-500/20 hover:border-purple-500/50 transition-all duration-300"
+              onClick={() => navigate('/matches')}
             >
-              <Plus className="h-4 w-4 mr-2" />
-              Find New Match
+              <UserCheck className="h-4 w-4 mr-2" />
+              Find Match
             </Button>
-            <div className="grid grid-cols-2 gap-2">
-              <Button variant="outline" size="sm" className="border-slate-600 text-slate-300 hover:bg-slate-700">
-                <Gift className="h-4 w-4 mr-1" />
-                Earn
+            <div className="grid grid-cols-4 gap-2">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="border-slate-600 text-slate-300 hover:bg-slate-700 p-2"
+                onClick={() => navigate('/points')}
+              >
+                <Gift className="h-4 w-4" />
               </Button>
-              <Button variant="outline" size="sm" className="border-slate-600 text-slate-300 hover:bg-slate-700">
-                <Star className="h-4 w-4 mr-1" />
-                Rate
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="border-slate-600 text-slate-300 hover:bg-slate-700 p-2"
+                onClick={() => navigate('/groups')}
+              >
+                <Users className="h-4 w-4" />
+              </Button>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="border-slate-600 text-slate-300 hover:bg-slate-700 p-2"
+                onClick={() => navigate('/games')}
+              >
+                <Gamepad2 className="h-4 w-4" />
+              </Button>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="border-slate-600 text-slate-300 hover:bg-slate-700 p-2"
+                onClick={() => navigate('/profile')}
+              >
+                <Settings className="h-4 w-4" />
               </Button>
             </div>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="border-yellow-600 text-yellow-300 hover:bg-yellow-500/20 border-yellow-500/50"
+              onClick={() => navigate('/admin')}
+            >
+              <Shield className="h-4 w-4 mr-2" />
+              Admin Panel
+            </Button>
           </div>
         </div>
       </div>
