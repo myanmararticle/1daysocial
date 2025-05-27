@@ -13,6 +13,11 @@ import Groups from "./pages/Groups";
 import Games from "./pages/Games";
 import Profile from "./pages/Profile";
 import Admin from "./pages/Admin";
+import Feed from "./pages/Feed";
+import Discover from "./pages/Discover";
+import CreatePost from "./pages/CreatePost";
+import Notifications from "./pages/Notifications";
+import UserProfile from "./pages/UserProfile";
 
 const queryClient = new QueryClient();
 
@@ -24,12 +29,17 @@ const App: React.FC = () => {
         <Sonner />
         <BrowserRouter>
           <Routes>
-            <Route path="/" element={<Index />} />
+            <Route path="/" element={<Feed />} />
+            <Route path="/discover" element={<Discover />} />
+            <Route path="/create" element={<CreatePost />} />
+            <Route path="/notifications" element={<Notifications />} />
+            <Route path="/profile" element={<UserProfile />} />
+            <Route path="/auth" element={<Index />} />
             <Route path="/points" element={<Points />} />
             <Route path="/matches" element={<Matches />} />
             <Route path="/groups" element={<Groups />} />
             <Route path="/games" element={<Games />} />
-            <Route path="/profile" element={<Profile />} />
+            <Route path="/legacy-profile" element={<Profile />} />
             <Route path="/admin" element={<Admin />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
